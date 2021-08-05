@@ -1,0 +1,3 @@
+docker-compose up
+docker exec -it pg_container bash
+psql --host=pg_container --dbname=db_products --username=user
