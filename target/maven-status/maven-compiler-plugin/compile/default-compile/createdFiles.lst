@@ -1,0 +1,6 @@
+com/andrew/dao/ProductDao.class
+com/andrew/web/PageGenerator.class
+com/andrew/util/CashedPropertyReader.class
+com/andrew/entity/Product.class
+com/andrew/dao/jdbc/JdbcProductDao.class
+com/andrew/main.class

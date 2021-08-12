@@ -1,0 +1,71 @@
+<html>
+<head>
+    <title>Welcome!</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <#include "styles/index.css">
+</head>
+<body>
+<div class="container">
+    <#include "components/header.html">
+    <form class="margin-top width center" action="/products" method="POST">
+        <div class="row">
+            <div class="col margin-top">
+             <b>Search:</b>  <input placeholder="Product name/description" class="form-control" name="query" required/>
+            </div>
+            <button class="btn btn-primary me-2 margin-top">Search product</button>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+        <tr class="tableRow">
+            <th>Id</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Date of creation</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <#list products as product>
+        <tr class="tableRow">
+            <td class="id">${product.id}</td>
+            <td>${product.name}</td>
+            <td>${product.price}</td>
+            <td>${product.date}</td>
+            <td>${product.description}</td>
+            <td><button class="btn btn-danger">delete</button>
+                </td>
+        </tr>
+        </#list>
+        </tbody>
+    </table>
+</div>
+<script>
+const buttons = document.querySelectorAll(".btn-danger");
+function getMethod(data){
+return  {
+ method: 'DELETE',
+ headers: {
+  'Content-type': 'application/json; charset=UTF-8'
+ },
+ body: JSON.stringify(data)
+}
+}
+    sendDelete = (event) => {
+     const tableRow = event.target.parentElement.parentElement;
+     const id =  tableRow.querySelector(".id").textContent;
+     fetch('http://localhost:8080/products', getMethod({id: id})).then(() => location.reload())
+     }
+
+    buttons.forEach(button => {
+    button.addEventListener("click", sendDelete)
+    })
+
+
+</script>
+</body>
+</html>

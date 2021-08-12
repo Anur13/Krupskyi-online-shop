@@ -1,6 +1,29 @@
 
 <style type="text/css">
-body{background-color:pink;}
-*{font-family:Tahoma, Verdana, Helvetica, sans-serif;}
-.table{width:50%; text-align:center; border: 1px dotted black;margin-left:auto;margin-right:auto;}
+.nav-item{
+padding-left: 5px;
+padding-right: 5px;
+
+border: 1px solid black !important;
+border-radius: 4px !important;
+}
+
+ body{
+ background-color:pink;
+ }
+
+a{
+color:black !important}
+
+.width{
+width: 40%;}
+.margin-top{
+margin-top: 20px;}
+
+.navbar-nav li{
+margin-left:10px;
+}
+.center{
+margin-left:auto;
+margin-right:auto;}
 </style>
