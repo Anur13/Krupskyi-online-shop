@@ -24,6 +24,12 @@ public class ServletFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
+        String path = httpServletRequest.getRequestURI();
+        if (path.equals("/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         List<String> storedCookiesList = CookiesManager.getCookiesList();
 
         Cookie[] cookies = httpServletRequest.getCookies();
@@ -40,7 +46,7 @@ public class ServletFilter implements Filter {
             }
         }
         if (!isValid) {
-            httpServletResponse.sendRedirect("/products/login");
+            httpServletResponse.sendRedirect("/login");
         }
         chain.doFilter(request, response);
     }

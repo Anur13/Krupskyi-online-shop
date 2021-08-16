@@ -21,7 +21,7 @@
                     <password>root</password>
                     <url>jdbc:postgresql://localhost:5432/db_products</url>
                     <schemas>
-                        <schema>V1-CreateProductTable.sql</schema>
+                        <schema>public</schema>
                     </schemas>
                 </configuration>
             </plugin>

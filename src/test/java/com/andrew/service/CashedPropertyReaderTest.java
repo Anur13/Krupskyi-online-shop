@@ -1,6 +1,6 @@
 package com.andrew.service;
 
-import com.andrew.util.CashedPropertyReader;
+import com.andrew.util.CachedPropertyReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ class CashedPropertyReaderTest {
         String password = "root";
         String url = "jdbc:postgresql://localhost:5432/db_products";
 
-        CashedPropertyReader cashedPropertyReader = new CashedPropertyReader();
+        CachedPropertyReader cashedPropertyReader = new CachedPropertyReader();
         Properties props = cashedPropertyReader.getCashedProperties();
 
         assertEquals(user, props.getProperty("user"));
