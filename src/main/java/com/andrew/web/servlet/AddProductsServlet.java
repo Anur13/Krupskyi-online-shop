@@ -1,6 +1,7 @@
 package com.andrew.web.servlet;
 
 import com.andrew.dao.jdbc.JdbcProductDao;
+import com.andrew.service.ProductService;
 import com.andrew.util.MyLogger;
 import com.andrew.web.PageGenerator;
 import org.apache.logging.log4j.Logger;
@@ -14,11 +15,9 @@ import java.io.*;
 
 public class AddProductsServlet extends HttpServlet {
     private Logger LOGGER = new MyLogger().getLogger();
-
-    private JdbcProductDao jdbcProductDao;
-
-    public AddProductsServlet(JdbcProductDao jdbcProductDao) {
-        this.jdbcProductDao = jdbcProductDao;
+    private ProductService productService;
+    public AddProductsServlet(ProductService productService) {
+        this.productService = productService;
     }
 
     @Override
@@ -36,7 +35,7 @@ public class AddProductsServlet extends HttpServlet {
         int price = Integer.parseInt(request.getParameter("price"));
         String description = request.getParameter("description");
 
-        jdbcProductDao.addProduct(name, price, description);
+        productService.addProduct(name, price, description);
         LOGGER.info(request);
 
         response.sendRedirect("/products");

@@ -13,7 +13,7 @@ import java.util.LinkedList;
 public class JdbcProductDao implements ProductDao {
     private static final RowMapper ROW_MAPPER = new RowMapper();
     private final MyPGSimpleDataSource MY_PGSIMPLE_DATA_SOURCE;
-    private Logger logger = new MyLogger().getLogger();
+    private final Logger LOGGER = new MyLogger().getLogger();
 
     public JdbcProductDao(MyPGSimpleDataSource myPGSimpleDataSource) {
         this.MY_PGSIMPLE_DATA_SOURCE = myPGSimpleDataSource;
@@ -26,19 +26,19 @@ public class JdbcProductDao implements ProductDao {
             LinkedList<Product> productsList = new LinkedList<>();
 
             while (resultSet.next()) {
-                productsList.add(ROW_MAPPER.mapRow(resultSet));
+                productsList.add(ROW_MAPPER.mapProductRow(resultSet));
             }
             return productsList;
 
         } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException("Cannot get products from db" , exception);
+            LOGGER.error(exception);
+            throw new RuntimeException("Cannot get products from db", exception);
         }
 
     }
 
     @Override
-    public LinkedList<Product> addProduct(String name, int price, String description) {
+    public void addProduct(String name, int price, String description) {
         String statement = "INSERT INTO products (name, price, date, description) VALUES (?,?,?,?)";
         try (Connection connection = MY_PGSIMPLE_DATA_SOURCE.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(statement);
@@ -51,11 +51,11 @@ public class JdbcProductDao implements ProductDao {
             preparedStatement.setString(4, description);
 
             preparedStatement.executeUpdate();
-            return getAllProducts();
+
 
         } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException("Cannot add product to db" , exception);
+            LOGGER.error(exception);
+            throw new RuntimeException("Cannot add product to db", exception);
         }
 
     }
@@ -64,25 +64,22 @@ public class JdbcProductDao implements ProductDao {
     @Override
     public LinkedList<Product> findProductsByNameOrDescription(String query) {
         String statement = "SELECT * FROM products WHERE name Like ? OR description Like ?";
-        try (Connection connection = new MyPGSimpleDataSource().getConnection();
+        try (Connection connection =  MY_PGSIMPLE_DATA_SOURCE.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(statement);
 
         ) {
             preparedStatement.setString(1, query + '%');
             preparedStatement.setString(2, query + '%');
-            ResultSet resultSet = preparedStatement.executeQuery();
-            LinkedList<Product> productsList = new LinkedList<>();
-
-            while (resultSet.next()) {
-                productsList.add(ROW_MAPPER.mapRow(resultSet));
+            try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                LinkedList<Product> productsList = new LinkedList<>();
+                while (resultSet.next()) {
+                    productsList.add(ROW_MAPPER.mapProductRow(resultSet));
+                }
+                return productsList;
             }
-            resultSet.close();
-            return productsList;
-
-
         } catch (SQLException exception) {
-            logger.error(exception);
-            throw new RuntimeException("Cannot find products in db" , exception);
+            LOGGER.error(exception);
+            throw new RuntimeException("Cannot find products in db", exception);
         }
     }
 
@@ -90,13 +87,14 @@ public class JdbcProductDao implements ProductDao {
     @Override
     public void deleteProduct(String id) {
         String statement = "DELETE FROM products WHERE id = ?;";
-        try (Connection connection = new MyPGSimpleDataSource().getConnection();
+        try (Connection connection = MY_PGSIMPLE_DATA_SOURCE.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(statement);
         ) {
-            preparedStatement.setString(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(id));
+            preparedStatement.executeUpdate();
         } catch (SQLException exception) {
             new MyLogger().getLogger().error(exception);
-            throw new RuntimeException("Cannot delete product from db" , exception);
+            throw new RuntimeException("Cannot delete product from db", exception);
         }
     }
 }

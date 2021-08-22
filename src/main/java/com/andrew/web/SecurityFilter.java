@@ -2,6 +2,8 @@ package com.andrew.web;
 
 import com.andrew.dao.jdbc.JdbcUserDao;
 import com.andrew.entity.User;
+import com.andrew.security.Session;
+import com.andrew.service.SecurityService;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -10,8 +12,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-public class ServletFilter implements Filter {
+public class SecurityFilter implements Filter {
     private boolean isValid = false;
+    SecurityService securityService;
+
+    public SecurityFilter(SecurityService securityService) {
+        this.securityService = securityService;
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -25,30 +32,18 @@ public class ServletFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         String path = httpServletRequest.getRequestURI();
-        if (path.equals("/login")) {
+        if (path.equals("/login") || path.equals("/register")) {
             chain.doFilter(request, response);
             return;
         }
-
-        List<String> storedCookiesList = CookiesManager.getCookiesList();
-
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                for (String storedCookie : storedCookiesList) {
-                    if ("token".equals(cookie.getName())) {
-                        if (storedCookie.equals(cookie.getValue())) {
-                            isValid = true;
-                        }
-                        break;
-                    }
-                }
-            }
+        String token = CookieParser.getTokenFromCookies(httpServletRequest.getCookies());
+        Session session = securityService.getSession(token);
+        if (session != null) {
+            httpServletRequest.setAttribute("session", session);
+            chain.doFilter(httpServletRequest, httpServletResponse);
+            return;
         }
-        if (!isValid) {
-            httpServletResponse.sendRedirect("/login");
-        }
-        chain.doFilter(request, response);
+        httpServletResponse.sendRedirect("/login");
     }
 
     @Override

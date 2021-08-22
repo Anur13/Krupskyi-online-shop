@@ -1,6 +1,7 @@
 package com.andrew.dao.jdbc;
 
 import com.andrew.dao.UserDao;
+import com.andrew.dao.jdbc.mapper.RowMapper;
 import com.andrew.entity.User;
 import com.andrew.util.MyLogger;
 import org.apache.logging.log4j.Logger;
@@ -18,31 +19,13 @@ public class JdbcUserDao implements UserDao {
         this.myPGSimpleDataSource = myPGSimpleDataSource;
     }
 
+    private static final RowMapper ROW_MAPPER = new RowMapper();
     private final Logger LOGGER = new MyLogger().getLogger();
 
-    @Override
-    public List<User> getAllUsers() {
-        try (Connection connection = myPGSimpleDataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM users");) {
-            LinkedList<User> userslist = new LinkedList<>();
-            while (resultSet.next()) {
-                String username = resultSet.getString("username");
-                String password = resultSet.getString("password");
-                User user = new User(username, password);
-                userslist.add(user);
-            }
-            return userslist;
-
-        } catch (SQLException exception) {
-            LOGGER.error(exception);
-            throw new RuntimeException("Cannot get users from db", exception);
-        }
-    }
 
     @Override
     public void addUser(String username, String password) {
-        String statement = "INSERT INTO users (username, password) VALUES (?,?)";
+        String statement = "INSERT INTO users (username, password) VALUES (?,?);";
         try (Connection connection = myPGSimpleDataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(statement);
         ) {
@@ -53,5 +36,26 @@ public class JdbcUserDao implements UserDao {
             LOGGER.error(exception);
             throw new RuntimeException("Cannot add user to db", exception);
         }
+    }
+
+    public User getUser(String username) {
+        String statement = "SELECT * FROM users WHERE username = ?;";
+        try (Connection connection = myPGSimpleDataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        ) {
+            preparedStatement.setString(1, username);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                User user = null;
+                while (resultSet.next()) {
+                    user = ROW_MAPPER.mapUserRow(resultSet);
+                }
+                return user;
+            }
+        } catch (SQLException exception) {
+            LOGGER.error(exception);
+            throw new RuntimeException("Cannot find user in db", exception);
+        }
+
     }
 }
