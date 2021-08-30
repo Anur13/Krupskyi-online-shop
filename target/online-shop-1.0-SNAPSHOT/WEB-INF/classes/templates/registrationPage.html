@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <#include "styles/index.css">
+
+</head>
+<body>
+<div class="container">
+  <#include "components/header.html">
+  <form class="width" action="/register" method="post">
+    <div class="row">
+      <div class="col margin-top">
+        <input type="text" name="username" class="form-control" placeholder="Username" aria-label="Login">
+      </div>
+      <div class="col margin-top">
+        <input type="text" name="password" class="form-control" placeholder="Password" aria-label="Password">
+      </div>
+    </div>
+    <button class="btn btn-primary me-2 margin-top">Register</button>
+  </form>
+</div>
+</body>
+</html>

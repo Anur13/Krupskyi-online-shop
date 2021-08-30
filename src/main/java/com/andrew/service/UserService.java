@@ -3,8 +3,10 @@ package com.andrew.service;
 import com.andrew.dao.UserDao;
 import com.andrew.dao.jdbc.JdbcUserDao;
 import com.andrew.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class UserService {
+    @Autowired
     UserDao userDao;
     SecurityService securityService;
 
@@ -13,7 +15,7 @@ public class UserService {
     }
 
     public User getUser(String username) {
-        User user = userDao.getUser(username);
+        User user = userDao.getUserByName(username);
         return user;
     }
 
@@ -21,7 +23,7 @@ public class UserService {
         this.securityService = securityService;
     }
 
-    public UserService(UserDao userDao) {
+    public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 }

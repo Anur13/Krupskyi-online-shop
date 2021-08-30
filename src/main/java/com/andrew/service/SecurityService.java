@@ -4,17 +4,16 @@ import com.andrew.entity.Product;
 import com.andrew.entity.User;
 import com.andrew.security.PasswordEncryptor;
 import com.andrew.security.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class SecurityService {
     private final Map<String, Session> SESSION_LIST = Collections.synchronizedMap(new HashMap<>());
+    @Autowired
     UserService userService;
-
-    public SecurityService(UserService userService) {
-        this.userService = userService;
-    }
+    private PasswordEncryptor passwordEncryptor;
 
     public List<Product> getCartByToken(String token) {
         return SESSION_LIST.get(token).getCart();
@@ -22,7 +21,7 @@ public class SecurityService {
 
 
     public String encryptPassword(String password) {
-        byte[] hash = new PasswordEncryptor().encryptPassword(password);
+        byte[] hash = passwordEncryptor.encryptPassword(password);
         StringBuilder stringBuilder = new StringBuilder();
         for (byte b : hash) {
             stringBuilder.append(String.valueOf(b));
@@ -31,6 +30,7 @@ public class SecurityService {
     }
 
     public Session getSession(String token) {
+        System.out.println(SESSION_LIST + "getSession");
         if (token != null) {
             Session session = SESSION_LIST.get(token);
             if (isTokenValid(token)) {
@@ -40,7 +40,7 @@ public class SecurityService {
         return null;
     }
 
-    public boolean isPasswordValid(String submittedPassword, String passwordFromDb) {
+    private boolean isPasswordValid(String submittedPassword, String passwordFromDb) {
         String encryptedPassword = encryptPassword(submittedPassword);
         return encryptedPassword.equals(passwordFromDb);
     }
@@ -54,7 +54,7 @@ public class SecurityService {
         return null;
     }
 
-    public boolean isTokenValid(String token) {
+    private boolean isTokenValid(String token) {
         Session session = SESSION_LIST.get(token);
         if (session == null) {
             return false;
@@ -70,8 +70,16 @@ public class SecurityService {
         String uuid = UUID.randomUUID().toString();
         Session session = new Session(LocalDateTime.now().plusHours(10000 / 3600), new ArrayList<>(), user);
         SESSION_LIST.put(uuid, session);
+        System.out.println(SESSION_LIST + "generateAndAddToken");
         return uuid;
     }
 
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+        this.passwordEncryptor = passwordEncryptor;
+    }
 }
 

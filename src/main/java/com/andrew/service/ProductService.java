@@ -9,7 +9,7 @@ import java.util.List;
 public class ProductService {
     private ProductDao productDao;
 
-    public LinkedList<Product> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productDao.getAllProducts();
     }
 

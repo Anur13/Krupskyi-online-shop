@@ -1,61 +1,38 @@
 package com.andrew.dao.jdbc;
 
 import com.andrew.dao.UserDao;
-import com.andrew.dao.jdbc.mapper.RowMapper;
+import com.andrew.dao.jdbc.mapper.UserRowMapper;
 import com.andrew.entity.User;
-import com.andrew.util.MyLogger;
-import org.apache.logging.log4j.Logger;
+import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.*;
-import java.util.LinkedList;
 import java.util.List;
 
-
+@AllArgsConstructor
 public class JdbcUserDao implements UserDao {
+    private static final UserRowMapper USER_ROW_MAPPER = new UserRowMapper();
+    private JdbcTemplate jdbcTemplate;
 
-    private MyPGSimpleDataSource myPGSimpleDataSource;
-
-    public JdbcUserDao(MyPGSimpleDataSource myPGSimpleDataSource) {
-        this.myPGSimpleDataSource = myPGSimpleDataSource;
-    }
-
-    private static final RowMapper ROW_MAPPER = new RowMapper();
-    private final Logger LOGGER = new MyLogger().getLogger();
-
-
+    private static final String ADD_USER_QUERY = "INSERT INTO users (username, password) VALUES (?,?);";
+    private static final String GET_USER_BY_NAME_QUERY = "SELECT * FROM users WHERE username = ?;";
+//    private static final String GET_ALL_USERS_QUERY = "SELECT * FROM "
     @Override
     public void addUser(String username, String password) {
-        String statement = "INSERT INTO users (username, password) VALUES (?,?);";
-        try (Connection connection = myPGSimpleDataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        ) {
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            preparedStatement.executeUpdate();
-        } catch (SQLException exception) {
-            LOGGER.error(exception);
-            throw new RuntimeException("Cannot add user to db", exception);
-        }
+        jdbcTemplate.update(ADD_USER_QUERY, username, password);
     }
 
-    public User getUser(String username) {
-        String statement = "SELECT * FROM users WHERE username = ?;";
-        try (Connection connection = myPGSimpleDataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(statement);
-        ) {
-            preparedStatement.setString(1, username);
-
-            try (ResultSet resultSet = preparedStatement.executeQuery();) {
-                User user = null;
-                while (resultSet.next()) {
-                    user = ROW_MAPPER.mapUserRow(resultSet);
-                }
-                return user;
-            }
-        } catch (SQLException exception) {
-            LOGGER.error(exception);
-            throw new RuntimeException("Cannot find user in db", exception);
-        }
-
+    public User getUserByName(String username) {
+        return (User) jdbcTemplate.queryForObject(GET_USER_BY_NAME_QUERY, USER_ROW_MAPPER, username);
     }
+
+//    public List<User> getAllUsers(){
+//
+//    }
+//    private boolean doesUserExist(String username){
+//
+//        return false;
+//    }
+
 }

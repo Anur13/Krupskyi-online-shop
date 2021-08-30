@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <#include "styles/index.css">
+</head>
+<body>
+<div class="container">
+    <#include "components/header.html">
+    <form class="margin-top width" action="/products/add" method="POST">
+        <div class="row">
+            <div class="col margin-top">
+                <input placeholder="Product name" class="form-control" type="text" name="name" required/>
+            </div>
+            <div class="col margin-top">
+                <input placeholder="Product price" class="form-control" type="number" name="price" required/>
+            </div>
+            <div class="col margin-top">
+                <input placeholder="Description" class="form-control" type="text" name="description" required/>
+            </div>
+            <button class="btn btn-primary me-2 margin-top">Add product</button>
+        </div>
+    </form>
+</div>
+
+<script>
+</script>
+</body>
+</html>
